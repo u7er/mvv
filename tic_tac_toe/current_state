@@ -1,0 +1,68 @@
+import pygame
+import sys
+pygame.init()
+
+
+block_size = 200
+margin = 5
+screen_size = block_size*3+margin*4
+screen = pygame.display.set_mode((screen_size, screen_size))
+
+matrix = [['*'] * 3 for _ in range(3)]
+#test = color.THECOLORS['green']
+black = (0, 0, 0)
+red = (255, 0, 0)
+blue = (0, 0, 255)
+white = (255,255,255)
+player_query = 0
+
+def check_win(matrix,player_sign):
+    for i in matrix:
+        if matrix[i].count("*") == 0 and set(player_sign) == set(matrix[i]):
+            return matrix[i][0]
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x_mouse, y_mouse = pygame.mouse.get_pos()
+            col = x_mouse // (block_size + margin)
+            row = y_mouse // (block_size + margin)
+            if matrix[row][col] != '*':
+                continue
+
+            if player_query % 2 == 0:
+                matrix[row][col] = 'x'
+            else:
+                matrix[row][col] = 'o'
+            player_query += 1
+
+    for row in range(3):
+        for col in range(3):
+            x = col * block_size + margin * (col+1)
+            y = row * block_size + margin * (row+1)
+
+            if matrix[row][col] == 'x':
+                block_color = red
+            elif matrix[row][col] == 'o':
+                block_color = blue
+            else:
+                block_color = white
+
+            pygame.draw.rect(screen, block_color, ((x, y),(block_size, block_size)), 0)
+            if block_color == red:
+                pygame.draw.line(\
+                    screen, \
+                    white, \
+                    (x, y), \
+                    (x + block_size, y + block_size), \
+                    3\
+                )
+                pygame.draw.line(screen, white, (x + block_size, y), (x, y + block_size), 3)
+            elif block_color == blue:
+                pygame.draw.circle(screen, white, (x + block_size // 2, y + block_size // 2), (block_size // 2) - margin, 3)
+            
+
+    pygame.display.flip()
